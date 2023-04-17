@@ -13,7 +13,16 @@ def read_input():
     # return both lines in one return
     
     # this is the sample return, notice the rstrip function
-    return (input().rstrip(), input().rstrip())
+    input_type = input().strip().upper()
+    pattern, text = '', ''
+    if input_type == 'I':
+        pattern = input().strip()
+        text = input().strip()
+    elif input_type == 'F':
+        with open("tests/06") as f:
+            pattern = f.readline().strip()
+            text = f.readline().strip()
+    return pattern, text
 
 def print_occurrences(output):
     # this function should control output, it doesn't need any return
@@ -23,7 +32,23 @@ def get_occurrences(pattern, text):
     # this function should find the occurances using Rabin Karp alghoritm 
 
     # and return an iterable variable
-    return [0]
+    positions = []
+    p_len = len(pattern)
+    t_len = len(text)
+
+    # calculate hash value of pattern and first substring of text of length p_len
+    p_hash = sum(ord(pattern[i]) * pow(10, p_len - 1 - i) for i in range(p_len))
+    t_hash = sum(ord(text[i]) * pow(10, p_len - 1 - i) for i in range(p_len))
+
+    # slide the pattern over the text and check for hash match
+    for i in range(t_len - p_len + 1):
+        if p_hash == t_hash and pattern == text[i:i+p_len]:
+            positions.append(i)
+        if i < t_len - p_len:
+            # calculate the hash value of next substring of text using rolling hash
+            t_hash = 10 * (t_hash - ord(text[i]) * pow(10, p_len - 1)) + ord(text[i + p_len])
+
+    return positions
 
 
 # this part launches the functions
